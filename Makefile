@@ -28,6 +28,7 @@ all: $(NAME) static shared
 
 build_dir:
 	mkdir -p $(BD)
+	echo "**" > build/.gitignore
 
 $(NAME): $(OBJS) 
 		$(CC) $(CFLAGS) $(I) $(LDDIRS) $(LDLIBS) $(LIB) $^ -o build/$(NAME)
