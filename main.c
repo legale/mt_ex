@@ -3,18 +3,18 @@
 #include <sys/types.h>
 #include <pthread.h>
  
-typedef struct exec_args {
+typedef struct exec_thread_arg {
     const char *cmd;
     char *buf;
     volatile size_t bufsize; 
     volatile size_t bytes_read; /* volatile to force compiler not to optimize this */
     volatile char thread_is_alive;
-} exec_args_t;
+} exec_thread_arg_t;
 
 
-void *exec(void *vargp){
+void *exec_thread(void *vargp){
     FILE *fp;
-    exec_args_t *args = (exec_args_t *)vargp;
+    exec_thread_arg_t *args = (exec_thread_arg_t *)vargp;
     printf("exec: %s\n", args->cmd);
 
     fp = popen(args->cmd, "r");
@@ -48,7 +48,7 @@ int main() {
     char *buf[bufsize];
     *buf = '\0';
 
-    exec_args_t args = {
+    exec_thread_arg_t args = {
         .cmd = "sudo tcpdump -nni $(ls /sys/class/net/ | head -1) -c 2",
         .bufsize = bufsize,
         .buf = (char *)buf,
@@ -58,7 +58,7 @@ int main() {
 
     pthread_t thread_id;
     printf("Before Thread create\n");
-    pthread_create(&thread_id, NULL, exec, (void *)&args);
+    pthread_create(&thread_id, NULL, exec_thread, (void *)&args);
 
     printf("After Thread create\n");
 
